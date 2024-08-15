@@ -25,7 +25,7 @@ require_once 'vendor/autoload.php';
 add_shortcode( 'quote_daily', function ( $atts ) {
 	$atts = shortcode_atts(
 		[
-			'author' => false,
+			'show_author' => false,
 		],
 		$atts
 	);
@@ -47,14 +47,14 @@ add_shortcode( 'quote_daily', function ( $atts ) {
 	return renderTemplate( 'templates/quote.php', [
 		'quote' => $quote[0]->q,
 		'author' => $quote[0]->a,
-		'showAuthor' => $atts['author'],
+		'showAuthor' => $atts['show_author'],
 	] );
 } );
 
 add_shortcode( 'quote_random', function ( $atts ) {
 	$atts = shortcode_atts(
 		[
-			'author' => false,
+			'show_author' => false,
 		],
 		$atts
 	);
@@ -66,7 +66,7 @@ add_shortcode( 'quote_random', function ( $atts ) {
 	return renderTemplate( 'templates/quote.php', [
 		'quote' => $quote[0]->q,
 		'author' => $quote[0]->a,
-		'showAuthor' => $atts['author'],
+		'showAuthor' => $atts['show_author'],
 	] );
 } );
 
