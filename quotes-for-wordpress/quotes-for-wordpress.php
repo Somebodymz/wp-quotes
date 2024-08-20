@@ -1,16 +1,25 @@
 <?php
 /*
 Plugin Name:       Quotes for WordPress
-Plugin URI:        https://github.com/somebodymz/wp-quotes
+Plugin URI:        https://github.com/Somebodymz/wp-quotes
 Description:       Provides famous quotes, quote of the day, and more for WordPress.
 Version:           1.0
 Requires at least: 6.0
 Requires PHP:      8.2
 Author:            Somebodymz
-Author URI:        https://github.com/somebodymz
+Author URI:        https://github.com/Somebodymz
 License:           MIT
 License URI:       https://opensource.org/licenses/MIT
 */
+
+/**
+ * This file is part of the Quotes for WordPress plugin.
+ *
+ * (c) Somebodymz <somebodymz@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Smz\WpQuotes;
 
