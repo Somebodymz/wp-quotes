@@ -3,7 +3,7 @@
 	"description": "Provides famous quotes, quote of the day, and more for WordPress.",
 	"type": "wordpress-plugin",
 	"require": {
-		"php": "^8.2"
+		"php": ">=8.2"
 	},
 	"license": "MIT",
 	"authors": [

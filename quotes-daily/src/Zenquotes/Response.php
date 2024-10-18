@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Quotes for WordPress plugin.
+ * This file is part of the Daily Quotes plugin.
  *
  * (c) Somebodymz <somebodymz@gmail.com>
  *

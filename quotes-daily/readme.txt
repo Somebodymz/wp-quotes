@@ -1,4 +1,4 @@
-=== Quotes for WordPress ===
+=== Daily Quotes ===
 Contributors: Somebodymz
 Tags: quotes, daily, famous
 Requires at least: 6.0
@@ -18,8 +18,8 @@ More documentation coming soon.
 Install it is just like any other WordPress plugin:
 
 * Navigate to Admin Area / **Plugins** page
-* In the search field enter **Quotes for WordPress**, then press Enter.
-* Select **Quotes for WordPress** and click **Install Now**
+* In the search field enter **Daily Quotes**, then press Enter.
+* Select **Daily Quotes** and click **Install Now**
 * Once installed, click **Activate**
 * You are ready to go!
 

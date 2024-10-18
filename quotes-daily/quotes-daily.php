@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name:       Quotes for WordPress
+Plugin Name:       Daily Quotes
 Plugin URI:        https://github.com/Somebodymz/wp-quotes
 Description:       Provides famous quotes, quote of the day, and more for WordPress.
 Version:           1.0
@@ -13,7 +13,7 @@ License URI:       https://opensource.org/licenses/MIT
 */
 
 /**
- * This file is part of the Quotes for WordPress plugin.
+ * This file is part of the Daily Quotes plugin.
  *
  * (c) Somebodymz <somebodymz@gmail.com>
  *

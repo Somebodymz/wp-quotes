@@ -6,7 +6,7 @@
  */
 ?>
 
-<div class="quotes-for-wordpress quote-daily">
+<div class="quotes-daily qd-daily">
 	<blockquote><?= $quote; ?></blockquote>
 	<?php if ( $showAuthor ): ?>
 		<small><?= $author; ?></small>
