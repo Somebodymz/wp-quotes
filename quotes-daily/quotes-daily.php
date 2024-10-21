@@ -43,8 +43,8 @@ add_shortcode( 'quote_daily', function ( $atts ) {
 	$quote = get_transient( 'quote_daily' );
 
 	if ( false === $quote ) {
-		$quoteJson = file_get_contents( 'https://zenquotes.io/api/today' );
-		$quote = json_decode( $quoteJson );
+		$quoteJson = wp_remote_get( 'https://zenquotes.io/api/today' );
+		$quote = json_decode( $quoteJson['body'] );
 
 		$currTime = time();
 		$endOfDayTimestamp = strtotime( 'tomorrow', $currTime );
@@ -68,9 +68,9 @@ add_shortcode( 'quote_random', function ( $atts ) {
 		$atts
 	);
 
-	$quoteJson = file_get_contents( 'https://zenquotes.io/api/random' );
+	$quoteJson = wp_remote_get( 'https://zenquotes.io/api/random' );
 	/** @var Response[]|false $quote */
-	$quote = json_decode( $quoteJson );
+	$quote = json_decode( $quoteJson['body'] );
 
 	return renderTemplate( 'templates/quote.php', [
 		'quote' => $quote[0]->q,
@@ -100,7 +100,7 @@ function renderTemplate( string $template, array $vars = [] ): string {
 	if ( file_exists( $templateAbsPath ) ) {
 		$renderer( $templateAbsPath, $vars );
 	} else {
-		echo "Template $template not found.";
+		echo esc_html( "Template $template not found." );
 	}
 
 	return ob_get_clean();
