@@ -1,8 +1,8 @@
 <?php
 /**
- * This file is part of the Daily Quotes plugin.
+ * This file is part of the Somebody's Daily Quotes plugin.
  *
- * (c) Somebodymz <somebodymz@gmail.com>
+ * (c) Somebodymz <somebody.mz@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
