@@ -7,8 +7,8 @@
 ?>
 
 <div class="quotes-daily qd-daily">
-	<blockquote><?= esc_html( $quote ); ?></blockquote>
+	<blockquote><?php echo esc_html( $quote ); ?></blockquote>
 	<?php if ( $showAuthor ): ?>
-		<small><?= esc_html( $author ); ?></small>
+		<small><?php echo esc_html( $author ); ?></small>
 	<?php endif; ?>
 </div>
