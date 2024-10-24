@@ -4,6 +4,10 @@
  * @var string $author
  * @var bool $showAuthor
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 ?>
 
 <div class="quotes-daily qd-daily">
