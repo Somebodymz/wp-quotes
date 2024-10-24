@@ -14,6 +14,10 @@ Provides famous quotes, quote of the day, and more for WordPress.
 Provides famous quotes, quote of the day, and more for WordPress.
 More documentation coming soon.
 
+== External services ==
+This plugin uses ZenQuotes.io service (https://zenquotes.io/) to retrieve and show the quotes. It doesn't send any user information and uses only free API to retrieve the data.
+This plugin doesn't affiliate with zenquotes website or any of its authors.
+
 == Installation ==
 Install it is just like any other WordPress plugin:
 
