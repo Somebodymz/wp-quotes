@@ -3,7 +3,7 @@ Contributors: Somebodymz
 Tags: quotes, daily, famous
 Requires at least: 6.0
 Tested up to: 6.6.1
-Requires PHP: 8.3
+Requires PHP: 8.2
 Stable tag: 1.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
