@@ -37,6 +37,7 @@ add_shortcode( 'quote_daily', function ( $atts ) {
 	$atts = shortcode_atts(
 		[
 			'show_author' => false,
+			'show_image' => false,
 		],
 		$atts
 	);
@@ -44,7 +45,7 @@ add_shortcode( 'quote_daily', function ( $atts ) {
 	/** @var Response[]|false $quote */
 	$quote = get_transient( 'quote_daily' );
 
-	if (false === $quote ) {
+	if ( empty( $quote ) ) {
 
 		$quote = doRequest( 'https://zenquotes.io/api/today' );
 
@@ -58,7 +59,9 @@ add_shortcode( 'quote_daily', function ( $atts ) {
 	return renderTemplate( 'templates/quote.php', [
 		'quote' => $quote[0]->q,
 		'author' => $quote[0]->a,
+		'image' => $quote[0]->i,
 		'showAuthor' => $atts['show_author'],
+		'showImage' => $atts['show_image'],
 	] );
 } );
 
@@ -66,6 +69,7 @@ add_shortcode( 'quote_random', function ( $atts ) {
 	$atts = shortcode_atts(
 		[
 			'show_author' => false,
+			'show_image' => false,
 		],
 		$atts
 	);
@@ -75,7 +79,9 @@ add_shortcode( 'quote_random', function ( $atts ) {
 	return renderTemplate( 'templates/quote.php', [
 		'quote' => $quote[0]->q,
 		'author' => $quote[0]->a,
+		'image' => $quote[0]->i,
 		'showAuthor' => $atts['show_author'],
+		'showImage' => $atts['show_image'],
 	] );
 } );
 
