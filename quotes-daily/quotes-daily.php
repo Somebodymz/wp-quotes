@@ -23,9 +23,11 @@ License URI:       https://opensource.org/licenses/MIT
 
 namespace Smz\WpQuotes;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Smz\WpQuotes\Zenquotes\Response;
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -42,9 +44,9 @@ add_shortcode( 'quote_daily', function ( $atts ) {
 	/** @var Response[]|false $quote */
 	$quote = get_transient( 'quote_daily' );
 
-	if ( false === $quote ) {
-		$quoteJson = wp_remote_get( 'https://zenquotes.io/api/today' );
-		$quote = json_decode( $quoteJson['body'] );
+	if (false === $quote ) {
+
+		$quote = doRequest( 'https://zenquotes.io/api/today' );
 
 		$currTime = time();
 		$endOfDayTimestamp = strtotime( 'tomorrow', $currTime );
@@ -68,9 +70,7 @@ add_shortcode( 'quote_random', function ( $atts ) {
 		$atts
 	);
 
-	$quoteJson = wp_remote_get( 'https://zenquotes.io/api/random' );
-	/** @var Response[]|false $quote */
-	$quote = json_decode( $quoteJson['body'] );
+	$quote = doRequest( 'https://zenquotes.io/api/random' );
 
 	return renderTemplate( 'templates/quote.php', [
 		'quote' => $quote[0]->q,
@@ -104,4 +104,22 @@ function renderTemplate( string $template, array $vars = [] ): string {
 	}
 
 	return ob_get_clean();
+}
+
+/**
+ * @param string $url
+ *
+ * @return Response[]|null
+ */
+function doRequest( string $url ): ?array {
+	try {
+		$client = new Client();
+		$response = $client->get( $url );
+
+		$quote = json_decode( $response->getBody()->getContents() );
+	} catch ( GuzzleException $e ) {
+		$quote = null;
+	}
+
+	return $quote;
 }
