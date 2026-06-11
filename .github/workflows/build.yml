@@ -191,8 +191,14 @@ jobs:
           cd "$SVN_PATH"
           svn st | sed -rn '/^\?/s/^.{8}(.+)$/\1/p' | xargs -r svn add
           svn st | sed -rn '/^!/s/^.{8}(.+)$/\1/p' | xargs -r svn rm
-          svn cp . "^/tags/${{ steps.version.outputs.value }}"
           svn ci -m "Release ${{ steps.version.outputs.value }}" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+          svn cp \
+            "https://plugins.svn.wordpress.org/quotes-daily/trunk" \
+            "https://plugins.svn.wordpress.org/quotes-daily/tags/${{ steps.version.outputs.value }}" \
+            -m "Add release tag ${{ steps.version.outputs.value }}" \
+            --username "$SVN_USERNAME" \
+            --password "$SVN_PASSWORD"
 
   # ──────────────────────────────────────────────
   # 4c. [release] Publish to GitHub Releases
