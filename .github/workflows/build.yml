@@ -1,0 +1,233 @@
+name: Build and publish the plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - release
+
+env:
+  PHP_VERSION: '8.2'
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10.33.4'
+
+jobs:
+  # ──────────────────────────────────────────────
+  # 1. Build PHP packages
+  # ──────────────────────────────────────────────
+  build-php:
+    name: Build PHP packages
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: curl, dom, intl, mbstring
+          tools: composer:v2
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y markdown
+
+      - name: Install Composer dependencies
+        working-directory: quotes-daily
+        run: composer install --no-interaction --no-dev --optimize-autoloader --prefer-dist
+
+      - name: Generate version and release manifests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
+        run: |
+          php pipelines/version.php > quotes-daily/version.id
+
+      - name: Prepare for packaging
+        working-directory: quotes-daily
+        run: |
+          rm -f .gitignore
+          rm -f composer.json
+          rm -f composer.lock
+          rm -f vendor/composer/installed.json
+
+          find ./vendor/ -name README.md \
+            -o -name README.rst \
+            -o -name CHANGELOG.md \
+            -o -name CHANGELOG \
+            -o -name CONTRIBUTING.md \
+            -o -name .gitkeep \
+            -o -name .gitignore \
+            -o -name .github \
+            -o -name composer.json \
+            -o -name Makefile \
+            -o -name Dockerfile \
+            -o -name .editorconfig \
+            -o -name .php_cs \
+            -o -name .php_cs.dist \
+            -o -name .travis.yml \
+            -o -name phpunit.xml \
+            -o -name phpunit.xml.dist | xargs rm -rf
+
+          rm -rf vendor/elao/enum/res
+          rm -rf vendor/google/recaptcha/examples
+          rm -rf vendor/google/recaptcha/tests
+          rm -rf vendor/paragonie/random_compat/dist
+          rm -rf vendor/paragonie/random_compat/other
+          rm -rf vendor/monolog/monolog/doc
+          rm -rf vendor/monolog/monolog/tests
+          rm -rf vendor/psr/log/Psr/Log/Test
+          rm -rf vendor/symfony/cache/Tests
+          rm -rf vendor/symfony/http-foundation/Tests
+          rm -rf vendor/foroco/php-browser-detection/tests
+          rm -rf vendor/twig/twig/doc
+          rm -rf vendor/twig/twig/test
+
+          rm -f vendor/google/recaptcha/ARCHITECTURE.md
+          rm -f vendor/google/recaptcha/app.yaml
+          rm -f vendor/guzzlehttp/guzzle/UPGRADING.md
+          rm -f vendor/paragonie/random_compat/build-phar.sh
+          rm -f vendor/paragonie/random_compat/psalm.xml
+          rm -f vendor/paragonie/random_compat/psalm-autoloader.php
+          rm -f vendor/twig/twig/drupal_test.sh
+
+      - name: Upload PHP artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: quotes-daily-php
+          path: quotes-daily/
+          include-hidden-files: true
+          retention-days: 1
+
+  # ──────────────────────────────────────────────
+  # 4a. [dev] Publish test pre-release to GitHub
+  # ──────────────────────────────────────────────
+  publish-github-dev:
+    name: Publish test pre-release to GitHub
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'dev' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download plugin artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: quotes-daily
+          path: plugin-free/
+
+      - name: Prepare release assets
+        id: prepare
+        run: |
+          mkdir -p release_assets
+
+          TAG_NAME="dev"
+          echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
+          rm -rf quotes-daily
+          mkdir -p quotes-daily
+          cp -r plugin-free/. quotes-daily/
+
+          zip -r "release_assets/quotes-daily_dev.zip" quotes-daily
+
+      - name: Create pre-release on GitHub
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "${{ steps.prepare.outputs.tag }}"
+          name: "Development Build"
+          prerelease: true
+          body: |
+            This ia a developer build.
+            Source code (zip/tar.gz) archives do not contain built plugin artifacts and are not intended for installation.
+          files: release_assets/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ──────────────────────────────────────────────
+  # 4b. [release] Publish plugin to WordPress.org
+  # ──────────────────────────────────────────────
+  publish-wordpress-release:
+    name: Publish to WordPress.org
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
+    runs-on: ubuntu-24.04
+    environment: wordpress-plugins-release
+    steps:
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Download plugin artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: quotes-daily
+          path: plugin/
+
+      - name: Read plugin version
+        id: version
+        working-directory: plugin
+        run: |
+          echo "value=$(cat version.id)" >> "$GITHUB_OUTPUT"
+          rm -f version.id
+
+      - name: Commit free plugin to Subversion
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        run: |
+          SVN_PATH="${{ runner.temp }}/quotes-daily-svn"
+
+          svn co https://plugins.svn.wordpress.org/quotes-daily/trunk "$SVN_PATH"
+          rm -rf "$SVN_PATH"/*
+          cp -r plugin/* "$SVN_PATH"/
+
+          cd "$SVN_PATH"
+          svn st | sed -rn '/^\?/s/^.{8}(.+)$/\1/p' | xargs -r svn add
+          svn st | sed -rn '/^!/s/^.{8}(.+)$/\1/p' | xargs -r svn rm
+          svn cp . "^/tags/${{ steps.version.outputs.value }}"
+          svn ci -m "Release ${{ steps.version.outputs.value }}" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+  # ──────────────────────────────────────────────
+  # 4c. [release] Publish to GitHub Releases
+  # ──────────────────────────────────────────────
+  publish-github-release:
+    name: Publish to GitHub Releases
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download free plugin artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: quotes-daily
+          path: plugin-free/
+
+      - name: Prepare release assets
+        id: prepare
+        run: |
+          mkdir -p release_assets
+
+          VERSION=$(cat plugin-free/version.id)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          rm -rf quotes-daily
+          cp -r plugin-free/. quotes-daily/
+
+          zip -r "release_assets/quotes-daily_$VERSION.zip" quotes-daily
+
+      - name: Create release on GitHub
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "${{ steps.prepare.outputs.version }}"
+          name: "Release ${{ steps.prepare.outputs.version }}"
+          files: release_assets/*
+          generate_release_notes: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
