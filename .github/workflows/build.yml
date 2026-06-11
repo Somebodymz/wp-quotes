@@ -143,8 +143,8 @@ jobs:
           name: "Development Build"
           prerelease: true
           body: |
-            This ia a developer build.
-            Source code (zip/tar.gz) archives do not contain built plugin artifacts and are not intended for installation.
+            This is a testing build.
+            Source code (zip/tar.gz) archives contain raw source code and are not intended for installation.
           files: release_assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
