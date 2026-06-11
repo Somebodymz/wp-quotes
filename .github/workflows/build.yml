@@ -112,6 +112,7 @@ jobs:
     name: Publish test pre-release to GitHub
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'dev' }}
     runs-on: ubuntu-24.04
+    needs: [ build-php ]
     permissions:
       contents: write
     steps:
@@ -155,6 +156,7 @@ jobs:
     name: Publish to WordPress.org
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
     runs-on: ubuntu-24.04
+    needs: [ build-php ]
     environment: wordpress-plugins-release
     steps:
       - name: Install Subversion
@@ -199,6 +201,7 @@ jobs:
     name: Publish to GitHub Releases
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
     runs-on: ubuntu-24.04
+    needs: [ build-php ]
     permissions:
       contents: write
     steps:
