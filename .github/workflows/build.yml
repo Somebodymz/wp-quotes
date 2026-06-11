@@ -100,7 +100,7 @@ jobs:
       - name: Upload PHP artifact
         uses: actions/upload-artifact@v6
         with:
-          name: quotes-daily-php
+          name: quotes-daily
           path: quotes-daily/
           include-hidden-files: true
           retention-days: 1
