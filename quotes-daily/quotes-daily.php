@@ -3,7 +3,7 @@
 Plugin Name:       Somebody's Daily Quotes
 Plugin URI:        https://github.com/Somebodymz/wp-quotes
 Description:       Provides famous quotes, quote of the day, and more for WordPress.
-Version:           1.1
+Version:           1.2
 Requires at least: 6.0
 Requires PHP:      8.2
 Author:            Somebodymz
