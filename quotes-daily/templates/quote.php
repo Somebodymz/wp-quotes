@@ -13,18 +13,18 @@ if ( !defined( 'ABSPATH' ) ) {
 ?>
 
 <style rel="stylesheet">
-	.quotes-daily blockquote {
+	.smz-wp-quotes blockquote {
 		overflow: hidden;
 	}
 
-	.quotes-daily img {
+	.smz-wp-quotes img {
 		float: left;
 		margin-right: 1rem;
 		margin-bottom: 1rem;
 	}
 </style>
 
-<div class="quotes-daily qd-daily">
+<div class="smz-wp-quotes">
 	<blockquote>
 		<?php if ( $showImage ): ?>
 			<img src="<?php echo esc_html( $image ); ?>" alt="<?php echo esc_html( $author ); ?>" />
