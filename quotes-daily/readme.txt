@@ -4,7 +4,7 @@ Tags: quotes, daily, famous
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.0
+Stable tag: 1.1
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -28,6 +28,13 @@ Install it is just like any other WordPress plugin:
 * You are ready to go!
 
 == Changelog ==
+
+= 1.1 =
+
+* Allow displaying a photo for the quote
+* Change required php version to 8.2
+* Update WordPress tested version to 7.0
+* Use Guzzle for http-requests
 
 = 1.0 =
 * Initial release.
