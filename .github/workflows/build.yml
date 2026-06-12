@@ -44,8 +44,8 @@ jobs:
         working-directory: quotes-daily
         run: composer install --no-interaction --no-dev --optimize-autoloader --prefer-dist
 
-      - name: Generate version and release manifests
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
+      - name: Determine release version
+        if: ${{ inputs.build_type == 'release' }}
         run: |
           php pipelines/version.php > quotes-daily/version.id
 
@@ -75,27 +75,8 @@ jobs:
             -o -name phpunit.xml \
             -o -name phpunit.xml.dist | xargs rm -rf
 
-          rm -rf vendor/elao/enum/res
-          rm -rf vendor/google/recaptcha/examples
-          rm -rf vendor/google/recaptcha/tests
-          rm -rf vendor/paragonie/random_compat/dist
-          rm -rf vendor/paragonie/random_compat/other
-          rm -rf vendor/monolog/monolog/doc
-          rm -rf vendor/monolog/monolog/tests
           rm -rf vendor/psr/log/Psr/Log/Test
-          rm -rf vendor/symfony/cache/Tests
-          rm -rf vendor/symfony/http-foundation/Tests
-          rm -rf vendor/foroco/php-browser-detection/tests
-          rm -rf vendor/twig/twig/doc
-          rm -rf vendor/twig/twig/test
-
-          rm -f vendor/google/recaptcha/ARCHITECTURE.md
-          rm -f vendor/google/recaptcha/app.yaml
           rm -f vendor/guzzlehttp/guzzle/UPGRADING.md
-          rm -f vendor/paragonie/random_compat/build-phar.sh
-          rm -f vendor/paragonie/random_compat/psalm.xml
-          rm -f vendor/paragonie/random_compat/psalm-autoloader.php
-          rm -f vendor/twig/twig/drupal_test.sh
 
       - name: Upload PHP artifact
         uses: actions/upload-artifact@v6
@@ -110,7 +91,7 @@ jobs:
   # ──────────────────────────────────────────────
   publish-github-dev:
     name: Publish test pre-release to GitHub
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'dev' }}
+    if: ${{ inputs.build_type == 'dev' }}
     runs-on: ubuntu-24.04
     needs: [ build-php ]
     permissions:
@@ -128,7 +109,7 @@ jobs:
           mkdir -p release_assets
 
           TAG_NAME="dev"
-          echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG_NAME}" >> "$GITHUB_OUTPUT"
 
           rm -rf quotes-daily
           mkdir -p quotes-daily
@@ -154,7 +135,7 @@ jobs:
   # ──────────────────────────────────────────────
   publish-wordpress-release:
     name: Publish to WordPress.org
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
+    if: ${{ inputs.build_type == 'release' }}
     runs-on: ubuntu-24.04
     needs: [ build-php ]
     environment: wordpress-plugins-release
@@ -185,7 +166,7 @@ jobs:
         run: |
           SVN_PATH="${{ runner.temp }}/quotes-daily-svn"
 
-          svn co https://plugins.svn.wordpress.org/quotes-daily/trunk "$SVN_PATH"
+          svn co https://plugins.svn.wordpress.org/quotes-daily/trunk "${SVN_PATH}"
           rm -rf "${SVN_PATH}"/*
           cp -r plugin/* "${SVN_PATH}"/
 
@@ -213,7 +194,7 @@ jobs:
   # ──────────────────────────────────────────────
   publish-github-release:
     name: Publish to GitHub Releases
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type == 'release' }}
+    if: ${{ inputs.build_type == 'release' }}
     runs-on: ubuntu-24.04
     needs: [ build-php ]
     permissions:
@@ -231,12 +212,12 @@ jobs:
           mkdir -p release_assets
 
           VERSION=$(cat plugin-free/version.id)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
           rm -rf quotes-daily
           cp -r plugin-free/. quotes-daily/
 
-          zip -r "release_assets/quotes-daily_$VERSION.zip" quotes-daily
+          zip -r "release_assets/quotes-daily.zip" quotes-daily
 
       - name: Create release on GitHub
         uses: softprops/action-gh-release@v3
