@@ -14,6 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Describes Zenquotes response.
+ */
 class Response {
 
 	/**

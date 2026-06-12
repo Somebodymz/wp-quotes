@@ -33,6 +33,9 @@ if ( !defined( 'ABSPATH' ) ) {
 
 require_once 'vendor/autoload.php';
 
+/**
+ * Add shortcode for daily quotes.
+ */
 add_shortcode( 'quote_daily', function ( $atts ) {
 	$atts = shortcode_atts(
 		[
@@ -65,6 +68,9 @@ add_shortcode( 'quote_daily', function ( $atts ) {
 	] );
 } );
 
+/**
+ * Add shortcode for random quotes.
+ */
 add_shortcode( 'quote_random', function ( $atts ) {
 	$atts = shortcode_atts(
 		[
@@ -113,6 +119,8 @@ function renderTemplate( string $template, array $vars = [] ): string {
 }
 
 /**
+ * Makes http-request.
+ *
  * @param string $url
  *
  * @return Response[]|null
