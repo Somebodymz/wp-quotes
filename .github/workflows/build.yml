@@ -163,6 +163,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y subversion
+          svn --version
 
       - name: Download plugin artifact
         uses: actions/download-artifact@v7
@@ -177,7 +178,7 @@ jobs:
           echo "value=$(cat version.id)" >> "$GITHUB_OUTPUT"
           rm -f version.id
 
-      - name: Commit free plugin to Subversion
+      - name: Commit to WordPress SVN
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
@@ -185,20 +186,27 @@ jobs:
           SVN_PATH="${{ runner.temp }}/quotes-daily-svn"
 
           svn co https://plugins.svn.wordpress.org/quotes-daily/trunk "$SVN_PATH"
-          rm -rf "$SVN_PATH"/*
-          cp -r plugin/* "$SVN_PATH"/
+          rm -rf "${SVN_PATH}"/*
+          cp -r plugin/* "${SVN_PATH}"/
 
-          cd "$SVN_PATH"
+          cd "${SVN_PATH}"
           svn st | sed -rn '/^\?/s/^.{8}(.+)$/\1/p' | xargs -r svn add
           svn st | sed -rn '/^!/s/^.{8}(.+)$/\1/p' | xargs -r svn rm
-          svn ci -m "Release ${{ steps.version.outputs.value }}" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+          svn ci \
+            -m "Release ${{ steps.version.outputs.value }}" \
+            --username "${SVN_USERNAME}" \
+            --password "${SVN_PASSWORD}" \
+            --non-interactive \
+            --no-auth-cache
 
           svn cp \
             "https://plugins.svn.wordpress.org/quotes-daily/trunk" \
             "https://plugins.svn.wordpress.org/quotes-daily/tags/${{ steps.version.outputs.value }}" \
             -m "Add release tag ${{ steps.version.outputs.value }}" \
-            --username "$SVN_USERNAME" \
-            --password "$SVN_PASSWORD"
+            --username "${SVN_USERNAME}" \
+            --password "${SVN_PASSWORD}" \
+            --non-interactive \
+            --no-auth-cache
 
   # ──────────────────────────────────────────────
   # 4c. [release] Publish to GitHub Releases
@@ -211,7 +219,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download free plugin artifact
+      - name: Download plugin artifact
         uses: actions/download-artifact@v7
         with:
           name: quotes-daily
